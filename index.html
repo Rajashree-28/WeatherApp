@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #6ab7ff, #ff6a9e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            width: 400px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid #fff;
+            background: transparent;
+            color: #fff;
+            margin-bottom: 15px;
+            outline: none;
+        }
+        button {
+            background-color: #fff;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+        }
+        button:hover {
+            background-color: #ff6a9e;
+            color: #fff;
+        }
+        .weather-info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .error {
+            color: #ff6a9e;
+            font-size: 18px;
+        }
+        .temperature {
+            font-size: 40px;
+            margin: 10px 0;
+        }
+        .details {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Finder</h1>
+        <input type="text" id="city" placeholder="Enter City Name">
+        <button onclick="getWeather()">Get Weather</button>
+        <div id="weather-result" class="weather-info"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById("city").value;
+            const apiKey = "66ae2361e12a4c938fa94156251803";
+            const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`;
+
+            if (city.trim() === "") {
+                document.getElementById("weather-result").innerHTML = "<p class='error'>Please enter a city name.</p>";
+                return;
+            }
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById("weather-result").innerHTML = `<p class='error'>${data.error.message}</p>`;
+                } else {
+                    const tempCelsius = data.current.temp_c;
+                    const tempFahrenheit = data.current.temp_f;
+                    const condition = data.current.condition.text;
+                    const icon = data.current.condition.icon;
+                    const windSpeed = data.current.wind_kph;
+                    const humidity = data.current.humidity;
+                    const cityName = data.location.name;
+                    const country = data.location.country;
+
+                    document.getElementById("weather-result").innerHTML = `
+                        <h2>${cityName}, ${country}</h2>
+                        <div class="temperature">${tempCelsius}°C (${tempFahrenheit}°F)</div>
+                        <img src="https:${icon}" alt="Weather Icon">
+                        <div class="details">Condition: ${condition}</div>
+                        <div class="details">Wind Speed: ${windSpeed} km/h</div>
+                        <div class="details">Humidity: ${humidity}%</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById("weather-result").innerHTML = `<p class='error'>Error fetching weather data. Try again later.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
